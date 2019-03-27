@@ -146,7 +146,7 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 data = data_make(
                         "model",            "",             DATA_STRING, _X("LaCrosse-WS","LaCrosse WS"),
                         "id",               "",             DATA_INT, sensor_id,
-                        "rainfall_mm",      "Rainfall",     DATA_FORMAT, "%3.2f mm", DATA_DOUBLE, rain_mm, NULL);
+                        _X("rain_mm","rainfall_mm"),      "Rainfall",     DATA_FORMAT, "%3.2f mm", DATA_DOUBLE, rain_mm, NULL);
                 decoder_output_data(decoder, data);
                 events++;
                 break;
@@ -163,14 +163,14 @@ static int lacrossews_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                     }
                 }
                 else {
-                    wind_key   = msg_type == 3 ? "wind_speed_ms" : "gust_speed_ms";
+                    wind_key   = msg_type == 3 ? _X("wind_avg_m_s","wind_speed_ms") : _X("wind_max_m_s","gust_speed_ms");
                     wind_label = msg_type == 3 ? "Wind speed" : "Gust speed";
 
                     data = data_make(
                             "model",            "",             DATA_STRING, _X("LaCrosse-WS","LaCrosse WS"),
                             "id",               "",             DATA_INT, sensor_id,
                             wind_key,           wind_label,     DATA_FORMAT, "%3.1f m/s", DATA_DOUBLE, wind_spd,
-                            "wind_direction",   "Direction",    DATA_DOUBLE, wind_dir, NULL);
+                            _X("wind_dir_deg","wind_direction"),   "Direction",    DATA_DOUBLE, wind_dir, NULL);
                     decoder_output_data(decoder, data);
                     events++;
                 }
@@ -194,10 +194,14 @@ static char *output_fields[] = {
     "id",
     "temperature_C",
     "humidity",
-    "rainfall_mm",
-    "wind_speed_ms",
-    "gust_speed_ms",
-    "wind_direction",
+    "rainfall_mm", // TODO: delete this
+    "rain_mm",
+    "wind_speed_ms", // TODO: delete this
+    "gust_speed_ms", // TODO: delete this
+    "wind_avg_m_s",
+    "wind_max_m_s",
+    "wind_direction", // TODO: delete this
+    "wind_dir_deg",
     NULL
 };
 

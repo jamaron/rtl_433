@@ -75,9 +75,19 @@ float get_os_pressure(r_device *decoder, unsigned char *message, unsigned int se
     if (decoder->verbose) {
         fprintf(stdout, " raw pressure data : %02x %02x\n", (int)message[8], (int)message[7]);
     }
-    // Pressure is given in inHg, but we really can't use that.
-    // Let's convert to hPa. 1 inHg equals 33.8639 HPa
-    float pressure = ((message[8]<<4)+message[7]) / 100.0 * 33.8639;
+    float pressure;
+    if (ID_BTHGN129 == sensor_id)
+    {
+        // Pressure is given in hPa. You may need to adjust the offset 
+        // according to your altitude level (600 is a good starting point)
+        pressure =  ((message[7]& 0x0f) | (message[8] & 0xf0))*2 + (message[8] & 0x01) + 600;
+    }
+    else
+    {
+        // Pressure is given in inHg, but we really can't use that.
+        // Let's convert to hPa. 1 inHg equals 33.8639 HPa
+        pressure = ((message[8]<<4)+message[7]) / 100.0 * 33.8639;
+    }
     return pressure;
 }
 
@@ -290,9 +300,9 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
                         "id",                 "House Code", DATA_INT,        get_os_rollingcode(msg, sensor_id),
                         "channel",        "Channel",        DATA_INT,        get_os_channel(msg, sensor_id),
                         "battery",        "Battery",        DATA_STRING, get_os_battery(msg, sensor_id) ? "LOW" : "OK",
-                        "gust",             "Gust",             DATA_FORMAT, "%2.1f m/s",DATA_DOUBLE, gustWindspeed,
-                        "average",        "Average",        DATA_FORMAT, "%2.1f m/s",DATA_DOUBLE, avgWindspeed,
-                        "direction",    "Direction",    DATA_FORMAT, "%3.1f degrees",DATA_DOUBLE, quadrant,
+                        _X("wind_max_m_s","gust"), "Gust",             DATA_FORMAT, "%2.1f m/s",DATA_DOUBLE, gustWindspeed,
+                        _X("wind_avg_m_s","average"), "Average",        DATA_FORMAT, "%2.1f m/s",DATA_DOUBLE, avgWindspeed,
+                        _X("wind_dir_deg","direction"),    "Direction",    DATA_FORMAT, "%3.1f degrees",DATA_DOUBLE, quadrant,
                         NULL);
                 decoder_output_data(decoder, data);
             }
@@ -339,8 +349,8 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
                         "id",                 "House Code", DATA_INT,        get_os_rollingcode(msg, sensor_id),
                         "channel",        "Channel",        DATA_INT,        get_os_channel(msg, sensor_id),
                         "battery",        "Battery",        DATA_STRING, get_os_battery(msg, sensor_id) ? "LOW" : "OK",
-                        "rain_rate",    "Rain Rate",    DATA_FORMAT, "%.02f mm/hr", DATA_DOUBLE, rain_rate,
-                        "total_rain", "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, total_rain,
+                        _X("rain_rate_mm_h","rain_rate"),    "Rain Rate",    DATA_FORMAT, "%.02f mm/hr", DATA_DOUBLE, rain_rate,
+                        _X("rain_mm","total_rain"), "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, total_rain,
                         NULL);
                 decoder_output_data(decoder, data);
             }
@@ -434,8 +444,8 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
 
             return 1;
         }
-        else if (sensor_id    == ID_BTHGN129) {
-            //if ((validate_os_v2_message(decoder, msg, 137, num_valid_v2_bits, 12) == 0)) {
+        else if (sensor_id == ID_BTHGN129) {
+            if ((validate_os_v2_message(decoder, msg, 185, num_valid_v2_bits, 19) == 0)) {
                 float temp_c = get_os_temperature(msg, sensor_id);
                 float pressure = get_os_pressure(decoder, msg, sensor_id);
                 data = data_make(
@@ -449,7 +459,7 @@ static int oregon_scientific_v2_1_parser(r_device *decoder, bitbuffer_t *bitbuff
                         "pressure_hPa",    "Pressure",        DATA_FORMAT, "%.02f hPa", DATA_DOUBLE, pressure,
                         NULL);
                 decoder_output_data(decoder, data);
-            //}
+            }
 
             return 1;
         }
@@ -601,8 +611,8 @@ static int oregon_scientific_v3_parser(r_device *decoder, bitbuffer_t *bitbuffer
                     "id",                 "House Code", DATA_INT,        get_os_rollingcode(msg, sensor_id),
                     "channel",        "Channel",        DATA_INT,        get_os_channel(msg, sensor_id),
                     "battery",        "Battery",        DATA_STRING, get_os_battery(msg, sensor_id)?"LOW":"OK",
-                    "rain_rate",    "Rain Rate",    DATA_FORMAT, "%3.1f in/hr", DATA_DOUBLE, rain_rate,
-                    "rain_total", "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
+                    _X("rain_rate_in_h","rain_rate"),    "Rain Rate",    DATA_FORMAT, "%3.1f in/hr", DATA_DOUBLE, rain_rate,
+                    _X("rain_in","rain_total"), "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
                     NULL);
                 decoder_output_data(decoder, data);
             }
@@ -618,8 +628,8 @@ static int oregon_scientific_v3_parser(r_device *decoder, bitbuffer_t *bitbuffer
                         "id",                 "House Code", DATA_INT,        get_os_rollingcode(msg, sensor_id),
                         "channel",        "Channel",        DATA_INT,        get_os_channel(msg, sensor_id),
                         "battery",        "Battery",        DATA_STRING, get_os_battery(msg, sensor_id)?"LOW":"OK",
-                        "rain_rate",    "Rain Rate",    DATA_FORMAT, "%3.1f in/hr", DATA_DOUBLE, rain_rate,
-                        "rain_total", "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
+                        _X("rain_rate_in_h","rain_rate"),    "Rain Rate",    DATA_FORMAT, "%3.1f in/hr", DATA_DOUBLE, rain_rate,
+                        _X("rain_in","rain_total"), "Total Rain", DATA_FORMAT, "%3.1f in", DATA_DOUBLE, total_rain,
                         NULL);
                 decoder_output_data(decoder, data);
             }
@@ -636,9 +646,9 @@ static int oregon_scientific_v3_parser(r_device *decoder, bitbuffer_t *bitbuffer
                         "id",                 "House Code", DATA_INT,         get_os_rollingcode(msg, sensor_id),
                         "channel",        "Channel",        DATA_INT,         get_os_channel(msg, sensor_id),
                         "battery",        "Battery",        DATA_STRING,    get_os_battery(msg, sensor_id)?"LOW":"OK",
-                        "gust",             "Gust",             DATA_FORMAT,    "%2.1f m/s",DATA_DOUBLE, gustWindspeed,
-                        "average",        "Average",        DATA_FORMAT,    "%2.1f m/s",DATA_DOUBLE, avgWindspeed,
-                        "direction",    "Direction",    DATA_FORMAT,    "%3.1f degrees",DATA_DOUBLE, quadrant,
+                        _X("wind_max_m_s","gust"),             "Gust",             DATA_FORMAT,    "%2.1f m/s",DATA_DOUBLE, gustWindspeed,
+                        _X("wind_avg_m_s","average"),        "Average",        DATA_FORMAT,    "%2.1f m/s",DATA_DOUBLE, avgWindspeed,
+                        _X("wind_dir_deg","direction"),    "Direction",    DATA_FORMAT,    "%3.1f degrees",DATA_DOUBLE, quadrant,
                         NULL);
                 decoder_output_data(decoder, data);
             }
@@ -729,11 +739,18 @@ static char *output_fields[] = {
     "battery",
     "temperature_C",
     "humidity",
-    "rain_rate",
-    "rain_total",
-    "gust",
-    "average",
-    "direction",
+    "rain_rate", // TODO: remove this
+    "rain_rate_mm_h",
+    "rain_rate_in_h",
+    "rain_total", // TODO: remove this
+    "rain_mm",
+    "rain_in",
+    "gust", // TODO: remove this
+    "average", // TODO: remove this
+    "direction", // TODO: remove this
+    "wind_max_m_s",
+    "wind_avg_m_s",
+    "wind_dir_deg",
     "pressure_hPa",
     "uv",
     "power_W",

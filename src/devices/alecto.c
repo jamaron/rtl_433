@@ -155,8 +155,8 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                     "id",             "House Code", DATA_INT,    sensor_id,
                     "channel",        "Channel",    DATA_INT,    channel,
                     "battery",        "Battery",    DATA_STRING, battery_low ? "LOW" : "OK",
-                    "wind_speed",     "Wind speed", DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, speed * 0.2F,
-                    "wind_gust",      "Wind gust",  DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, gust * 0.2F,
+                    _X("wind_avg_m_s","wind_speed"),     "Wind speed", DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, speed * 0.2F,
+                    _X("wind_max_m_s","wind_gust"),      "Wind gust",  DATA_FORMAT, "%.2f m/s", DATA_DOUBLE, gust * 0.2F,
                     "wind_direction", "Direction",  DATA_INT,    direction,
                     "mic",           "Integrity",   DATA_STRING,    "CHECKSUM",
                     NULL);
@@ -174,7 +174,7 @@ static int alectov1_callback(r_device *decoder, bitbuffer_t *bitbuffer)
                 "id",            "House Code", DATA_INT,    sensor_id,
                 "channel",       "Channel",    DATA_INT,    channel,
                 "battery",       "Battery",    DATA_STRING, battery_low ? "LOW" : "OK",
-                "rain_total",    "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, rain_mm,
+                _X("rain_mm","rain_total"),    "Total Rain", DATA_FORMAT, "%.02f mm", DATA_DOUBLE, rain_mm,
                 "mic",           "Integrity",  DATA_STRING,    "CHECKSUM",
                 NULL);
         decoder_output_data(decoder, data);
@@ -217,10 +217,14 @@ static char *output_fields[] = {
     "battery",
     "temperature_C",
     "humidity",
-    "rain_total",
-    "wind_speed",
-    "wind_gust",
-    "wind_direction",
+    "rain_total", // TODO: remove this
+    "rain_mm",
+    "wind_speed", // TODO: remove this
+    "wind_gust", // TODO: remove this
+    "wind_direction", // TODO: remove this
+    "wind_avg_km_h",
+    "wind_max_km_h",
+    "wind_dir_deg",
     "mic",
     NULL
 };
