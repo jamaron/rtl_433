@@ -15,8 +15,10 @@ add_executable(rtl_433
 	list.c
 	mongoose.c
 	optparse.c
+	output_mqtt.c
 	pulse_demod.c
 	pulse_detect.c
+	r_api.c
 	r_util.c
 	rtl_433.c
 	samp_grab.c
@@ -76,6 +78,7 @@ add_executable(rtl_433
 	devices/lacrosse.c
 	devices/lacrosse_TX141TH_Bv2.c
 	devices/lacrosse_tx35.c
+	devices/lacrosse_ws7000.c
 	devices/lacrossews.c
 	devices/lightwave_rf.c
 	devices/m_bus.c

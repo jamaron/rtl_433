@@ -63,7 +63,7 @@ Usage:		= General options =
   [-w <filename> | help] Save data stream to output file (a '-' dumps samples to stdout)
   [-W <filename> | help] Save data stream to output file, overwrite existing file
 		= Data output options =
-  [-F kv | json | csv | syslog | null | help] Produce decoded output in given format.
+  [-F kv | json | csv | mqtt | syslog | null | help] Produce decoded output in given format.
        Append output to file with :<filename> (e.g. -F csv:log.csv), defaults to stdout.
        Specify host/port for syslog with e.g. -F syslog:127.0.0.1:1514
   [-M time | reltime | notime | hires | utc | protocol | level | stats | bits | help] Add various meta data to each output.
@@ -106,7 +106,7 @@ Supported device protocols:
     [31]  TFA-Twin-Plus-30.3049, Conrad KW9010, Ea2 BL999
     [32]  Fine Offset Electronics WH1080/WH3080 Weather Station
     [33]  WT450, WT260H, WT405H
-    [34]  LaCrosse WS-2310 Weather Station
+    [34]  LaCrosse WS-2310 / WS-3600 Weather Station
     [35]  Esperanza EWS
     [36]  Efergy e2 classic
     [37]* Inovalley kw9015b, TFA Dostmann 30.3161 (Rain and temperature sensor)
@@ -123,7 +123,7 @@ Supported device protocols:
     [48]  Akhan 100F14 remote keyless entry
     [49]  Quhwa
     [50]  OSv1 Temperature Sensor
-    [51]  Proove
+    [51]  Proove / Nexa / KlikAanKlikUit Wireless Switch
     [52]  Bresser Thermo-/Hygro-Sensor 3CH
     [53]  Springfield Temperature and Soil Moisture
     [54]  Oregon Scientific SL109H Remote Thermal Hygro Sensor
@@ -185,8 +185,8 @@ Supported device protocols:
     [112]  Ambient Weather TX-8300 Temperature/Humidity Sensor
     [113]  Ambient Weather WH31E Thermo-Hygrometer Sensor
     [114]  Maverick et73
-    [115]  Honeywell Wireless Doorbell
-    [116]  Honeywell Wireless Doorbell (FSK)
+    [115]  Honeywell ActivLink, Wireless Doorbell
+    [116]  Honeywell ActivLink, Wireless Doorbell (FSK)
     [117]* ESA1000 / ESA2000 Energy Monitor
     [118]* Biltema rain gauge
     [119]  Bresser Weather Center 5-in-1
@@ -194,6 +194,7 @@ Supported device protocols:
     [121]  Opus/Imagintronix XT300 Soil Moisture
     [122]* FS20
     [123]* Jansite TPMS Model TY02S
+    [124]  LaCrosse/ELV/Conrad WS7000/WS2500 weather sensors
 
 * Disabled by default, use -R n or -G
 
@@ -206,7 +207,7 @@ Option -d:
 [-d "" Open default SoapySDR device
 [-d driver=rtlsdr Open e.g. specific SoapySDR device
 	To set gain for SoapySDR use -g ELEM=val,ELEM=val,... e.g. -g LNA=20,TIA=8,PGA=2 (for LimeSDR).
-[-d rtl_tcp[:host[:port]] (default: localhost:1234)
+[-d rtl_tcp[:[//]host[:port]] (default: localhost:1234)
 	Specify host/port to connect to with e.g. -d rtl_tcp:127.0.0.1:1234
 
 Option -g:
@@ -269,9 +270,17 @@ E.g. -X "n=doorbell,m=OOK_PWM,s=400,l=800,r=7000,g=1000,match={24}0xa9878c,repea
 
 
 Option -F:
-[-F kv|json|csv|syslog|null] Produce decoded output in given format.
+[-F kv|json|csv|mqtt|syslog|null] Produce decoded output in given format.
 	Without this option the default is KV output. Use "-F null" to remove the default.
 	Append output to file with :<filename> (e.g. -F csv:log.csv), defaults to stdout.
+	Specify MQTT server with e.g. -F mqtt://localhost:1883
+	Add MQTT options with e.g. -F "mqtt://host:1883,opt=arg"
+	MQTT options are: user=foo, pass=bar, retain[=0|1],
+		 usechannel=replaceid|afterid|beforeid|no, <format>[=topic]
+	Supported MQTT formats: (default is all)
+	  events: posts JSON event data
+	  states: posts JSON state data
+	  devices: posts device and sensor info in nested topics
 	Specify host/port for syslog with e.g. -F syslog:127.0.0.1:1514
 
 Option -M:

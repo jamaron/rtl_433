@@ -59,10 +59,19 @@
     <ClInclude Include="..\include\optparse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\output_mqtt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="..\include\pulse_demod.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\pulse_detect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\r_api.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\r_private.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\r_device.h">
@@ -133,10 +142,16 @@
     <ClCompile Include="..\src\optparse.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\output_mqtt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\pulse_demod.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\pulse_detect.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\r_api.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\r_util.c">
@@ -317,6 +332,9 @@
       <Filter>Source Files\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\src\devices\lacrosse_tx35.c">
+      <Filter>Source Files\devices</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\devices\lacrosse_ws7000.c">
       <Filter>Source Files\devices</Filter>
     </ClCompile>
     <ClCompile Include="..\src\devices\lacrossews.c">
